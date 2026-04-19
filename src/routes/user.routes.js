@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { listUsers, getUser, deleteUser } from '../controllers/user.controller.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
-import { requireRole } from '../middlewares/role.middleware.js';
+import { authorize} from '../middlewares/role.middleware.js';
 
 /**
  * TODO: Define user routes (all require admin role)
@@ -14,8 +14,13 @@ import { requireRole } from '../middlewares/role.middleware.js';
  * Apply requireRole('admin') middleware to all routes
  */
 
-const router = Router();
+const usersRouter = Router();
+
+usersRouter.get("/", authenticate, authorize("admin"), listUsers)
+usersRouter.get("/:id", authenticate, authorize("admin"), getUser)
+usersRouter.delete("/:id", authenticate, authorize("admin"), deleteUser)
 
 // Your routes here
 
-export default router;
+
+export default usersRouter;

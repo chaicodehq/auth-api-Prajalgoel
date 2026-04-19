@@ -1,5 +1,5 @@
-import { User } from '../models/user.model.js';
-import { verifyToken } from '../utils/jwt.js';
+import { User } from "../models/user.model.js";
+import { verifyToken } from "../utils/jwt.js";
 
 /**
  * TODO: Authenticate user using JWT
@@ -16,9 +16,48 @@ import { verifyToken } from '../utils/jwt.js';
  * 7. Call next()
  */
 export async function authenticate(req, res, next) {
-  try {
-    // Your code here
-  } catch (error) {
-    return res.status(401).json({ error: { message: 'Invalid token' } });
-  }
+    try {
+        // Your code here
+        const header = req.headers.authorization;
+        if (!header || !header.startsWith("Bearer ") || !header.split(" ")[1]) {
+            return res.status(401).json({
+                error: {
+                    message: "No token provided",
+                },
+            });
+        }
+
+        const token = header.split(" ")[1];
+
+        let decoded;
+        try {
+            decoded = verifyToken(token);
+        } catch (error) {
+            return res.status(401).json({
+                error: {
+                    message: "Invalid token",
+                },
+            });
+        }
+
+        const user = await User.findById(decoded.userId);
+        if (!user)
+            return res.status(401).json({
+                error: {
+                    message: "Invalid token",
+                },
+            });
+
+        req.user = {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        };
+
+        next();
+    } catch (error) {
+      console.log(error);
+      
+        return res.status(401).json({ error: { message: "Invalid token" } });
+    }
 }

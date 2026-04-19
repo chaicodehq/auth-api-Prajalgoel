@@ -8,6 +8,26 @@
  * 3. Handle all other errors:
  *    - Return 500 with { error: { message: error.message } }
  */
-export function errorHandler(error, req, res, next) {
-  // Your code here
-}
+export const errorHandler = (error, req, res, next) => {
+    console.log(error);
+    
+    if (error.name === "ValidationError")
+        return res.status(400).json({
+            error: {
+                message: error.message,
+            },
+        });
+    else if (error.code === 11000)
+        return res.status(409).json({
+            error: {
+                message: "Email already exists",
+            },
+        });
+    else {
+        return res.status(500).json({
+            error: {
+                message: error.message,
+            },
+        });
+    }
+};

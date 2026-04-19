@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { register, login, me } from '../controllers/auth.controller.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
+import * as controller from'../controllers/auth.controller.js'
 
 /**
  * TODO: Define auth routes
@@ -10,8 +10,11 @@ import { authenticate } from '../middlewares/auth.middleware.js';
  * GET    /me        → me (requires authenticate middleware)
  */
 
-const router = Router();
+const authRouter = Router();
 
 // Your routes here
+authRouter.post("/register", controller.registerController)
+authRouter.post("/login", controller.loginController)
+authRouter.get("/me", authenticate, controller.meController)
 
-export default router;
+export default authRouter;
